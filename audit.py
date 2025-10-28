@@ -17,7 +17,8 @@ urls = ["https://dailybruin.com/",
         "https://dailybruin.com/2025/10/27/beat-breakdown-following-ryder-dodd-who-is-ucla-mens-waterpolos-next-best-player",
         "https://dailybruin.com/category/news"
 ]
-output_dir = "/Users/hannie/db-audit"
+# Folder to save all reports (relative path)
+output_dir = "audit-reports" 
 os.makedirs(output_dir, exist_ok=True) 
 
 for url in urls:
@@ -62,7 +63,7 @@ for url in urls:
 
     print(f"Added results for {url}")
   
-save_path = "/Users/hannie/db-audit/lighthouse_" + name + "_" + getdate + ".csv"
+save_path = os.path.join(output_dir, f"lighthouse_{name}_{getdate}.csv")
 df.to_csv(save_path, index=False)
 
 print("All results saved to:", save_path)
