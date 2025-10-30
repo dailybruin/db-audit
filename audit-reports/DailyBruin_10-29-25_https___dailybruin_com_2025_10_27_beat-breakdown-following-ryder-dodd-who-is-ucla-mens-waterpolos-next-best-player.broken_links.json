@@ -1,0 +1,23 @@
+{
+  "page_url": "https://dailybruin.com/2025/10/27/beat-breakdown-following-ryder-dodd-who-is-ucla-mens-waterpolos-next-best-player",
+  "total_links_checked": 58,
+  "broken_links_count": 3,
+  "broken_links": [
+    {
+      "url": "https://www.twitter.com/dailybruin",
+      "status_code": 403,
+      "error": null
+    },
+    {
+      "url": "https://www.twitter.com/intent/tweet?url=https://dailybruin.com/2025/10/27/beat-breakdown-following-ryder-dodd-who-is-ucla-mens-waterpolos-next-best-player/",
+      "status_code": 403,
+      "error": null
+    },
+    {
+      "url": "https://dailybruin.com/cdn-cgi/l/email-protection",
+      "status_code": 404,
+      "error": null
+    }
+  ],
+  "timestamp": "2025-10-29T23:43:28.508587"
+}
