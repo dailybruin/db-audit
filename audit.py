@@ -91,11 +91,40 @@ def find_broken_links(base_url, all_links):
     
     return broken_links
 
+def load_urls_from_csv(csv_path):
+    """
+    Load URLs from a CSV file created by webcrawling.py
+    
+    Args:
+        csv_path: Path to the CSV file containing URLs
+        
+    Returns:
+        List of URLs extracted from the 'URL' column
+    """
+    try:
+        df = pd.read_csv(csv_path)
+        
+        # Check if 'URL' column exists
+        if 'URL' not in df.columns:
+            print(f"Error: 'URL' column not found in {csv_path}")
+            print(f"Available columns: {list(df.columns)}")
+            return []
+        
+        # Extract URLs and remove any NaN values
+        urls = df['URL'].dropna().tolist()
+        
+        print(f"Loaded {len(urls)} URLs from {csv_path}")
+        return urls
+        
+    except FileNotFoundError:
+        print(f"Error: File not found: {csv_path}")
+        return []
+    except Exception as e:
+        print(f"Error reading CSV file: {e}")
+        return []
+
 # manually select some URLs to test this audit on, later we can expand this to crawl the site
-urls = ["https://dailybruin.com/",
-        "https://dailybruin.com/2025/10/27/beat-breakdown-following-ryder-dodd-who-is-ucla-mens-waterpolos-next-best-player",
-        "https://dailybruin.com/category/news"
-]
+urls = load_urls_from_csv("audit-reports/URL_List.csv")
 # Folder to save all reports (relative path)
 output_dir = "audit-reports" 
 os.makedirs(output_dir, exist_ok=True) 
@@ -127,6 +156,13 @@ for url in urls:
     accessibility = str(round(loaded_json["categories"]["accessibility"]["score"] * 100))
     performance = str(round(loaded_json["categories"]["performance"]["score"] * 100))
     best_practices = str(round(loaded_json["categories"]["best-practices"]["score"] * 100))
+    
+    # Delete the Lighthouse JSON report after extracting scores
+    try:
+        os.remove(json_filename)
+        print(f"  ✓ Deleted Lighthouse report: {json_filename}")
+    except Exception as e:
+        print(f"  ⚠ Could not delete {json_filename}: {e}")
 
     # Check for broken links first (before adding to DataFrame)
     print(f"\nChecking for broken links on: {url}")
@@ -142,8 +178,8 @@ for url in urls:
         'broken_links': broken_links,
         'timestamp': datetime.now().isoformat()
     }
-    with open(broken_links_filename, 'w') as f:
-        json.dump(broken_links_data, f, indent=2)
+    # with open(broken_links_filename, 'w') as f:
+    #     json.dump(broken_links_data, f, indent=2)
     
     print(f"  ✓ Found {len(broken_links)} broken link(s) out of {len(all_links)} total links")
 
@@ -154,12 +190,13 @@ for url in urls:
         "Accessibility": accessibility,
         "Performance": performance,
         "Best Practices": best_practices,
-        "Broken Links": len(broken_links)
+        "Broken Links Count": len(broken_links),
+        "Broken Links": broken_links
     }
 
     # Append the dictionary as a new row in the DataFrame
     df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
-    
+
     print(f"Added results for {url}\n")
   
 save_path = os.path.join(output_dir, f"lighthouse_{name}_{getdate}.csv")
